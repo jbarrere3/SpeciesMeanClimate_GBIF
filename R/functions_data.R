@@ -155,6 +155,9 @@ get_data_gbif <- function(gbif_taxon_keys, user, pwd, email){
   print("Downloading files")
   occ_download_wait(request_download[[1]])
   
+  # In case the output dir is not created, create it
+  if(!dir.exists("output")) dir.create("output")
+  
   # Once download is complete, get the data
   out <- occ_download_get(request_download[[1]], path = "output", overwrite = TRUE) %>% 
     occ_download_import %>%
