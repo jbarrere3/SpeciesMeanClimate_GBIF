@@ -52,7 +52,7 @@ list(
   tar_target(globsnow_files, get_GlobSnow("data/GlobSnow"), format = "file"),
   
   # Download Gloabal Wind atlas data on wind speed
-  tar_target(globalwindatlas_files, getGlobalWindAtlas("data/GlobalWindAtlas"), format = "file"),
+  tar_target(globalwindatlas_files, get_GlobalWindAtlas("data/GlobalWindAtlas"), format = "file"),
   
   # Fire weather index files at global scale (need to download it before running the script)
   tar_target(fireweatherindex_files, list.files("data/FireWeatherIndex", full.names = TRUE), format = "file"),

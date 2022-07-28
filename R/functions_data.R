@@ -305,9 +305,6 @@ get_GlobSnow <- function(dir.in){
   # - Apply function to download all files
   for(j in 1:length(url.in)) get_and_write(dir.in, url.in[j])
   
-  # - List of all files extracted (archived)
-  #list.files(dir.in, full.names = TRUE) %>% walk(gunzip)
-  
   # Return the name of the extracted files
   return(paste(dir.in, list.files(dir.in), sep = "/"))
 }
@@ -315,13 +312,16 @@ get_GlobSnow <- function(dir.in){
 
 #' Function to download wind speed data from the global Wind atlas
 #' @param dir.in directory where to save the file
-getGlobalWindAtlas <- function(dir.in){
+get_GlobalWindAtlas <- function(dir.in){
   
   # - URL to download the file
   url.in <- "https://figshare.com/ndownloader/files/17247017"
   
   # - Name of the file to download
   file.in <- paste(dir.in, "gwa3_250_wind-speed_100m.tif", sep = "/")
+  
+  # - Create directory if needed
+  create_dir_if_needed(file.in)
   
   # - Download the file
   try(GET(url.in, write_disk(file.in, overwrite = TRUE)))
