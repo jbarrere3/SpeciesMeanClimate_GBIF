@@ -178,66 +178,6 @@ get_data_gbif <- function(gbif_taxon_keys, user, pwd, email){
 
 
 
-#' #' Function to send a data request to GBIF
-#' #' @param gbif_taxon_keys List of all taxon keys fo the species for which to get data
-#' #' @param user gbif username
-#' #' @param pwd gbif password
-#' #' @param email email for gbif
-#' #' @author Georges Kunstler
-#' send_data_reqst_gbif <- function(gbif_taxon_keys, user, pwd, email){
-#'   # use matched gbif_taxon_keys from above 
-#'   res <- occ_download(
-#'     pred_in("taxonKey", gbif_taxon_keys),
-#'     pred_in("basisOfRecord", c('HUMAN_OBSERVATION','OBSERVATION','MACHINE_OBSERVATION')),
-#'     pred("hasCoordinate", TRUE),
-#'     pred("hasGeospatialIssue", FALSE),
-#'     pred_or(
-#'       pred_not(pred("establishmentMeans","INTRODUCED")),
-#'       pred_not(pred_notnull("establishmentMeans"))
-#'     ),
-#'     pred_or(
-#'       pred_not(pred("establishmentMeans","INVASIVE")),
-#'       pred_not(pred_notnull("establishmentMeans"))
-#'     ),
-#'     pred_or(
-#'       pred_not(pred("establishmentMeans","NATURALISED")),
-#'       pred_not(pred_notnull("establishmentMeans"))
-#'     ),
-#'     pred_or(
-#'       pred_lt("coordinateUncertaintyInMeters",10000),
-#'       pred_not(pred_notnull("coordinateUncertaintyInMeters"))
-#'     ),
-#'     format = "SIMPLE_CSV",
-#'     user=user,pwd=pwd,email=email
-#'   )
-#'   
-#'   out <- occ_download_get(res[[1]], path = "output", overwrite = TRUE)  %>% occ_download_import
-#'   return(out)
-#' }
-#' 
-#' 
-#' #' Get the requested data from GBIF
-#' #' @param res GBIF request
-#' #' @author Georges Kunstler
-#' get_requested_data <- function(res){
-#'   
-#'   
-#'   out <- res %>%
-#'     setNames(tolower(names(.))) %>% # set lowercase column names to work with CoordinateCleaner
-#'     filter(coordinateprecision < 0.01 | is.na(coordinateprecision)) %>% 
-#'     filter(!coordinateuncertaintyinmeters %in% c(999, 9999)) %>% 
-#'     filter(!decimallatitude == 0 | !decimallongitude == 0) %>%
-#'     cc_cen(buffer = 2000) %>% # remove country centroids within 2km 
-#'     cc_cap(buffer = 2000) %>% # remove capitals centroids within 2km
-#'     cc_inst(buffer = 2000) %>% # remove zoo and herbaria within 2km 
-#'     cc_sea() %>% # remove from ocean 
-#'     distinct(decimallongitude,decimallatitude,specieskey,datasetkey, .keep_all = TRUE) %>%
-#'     glimpse()
-#'   return(dat)
-#' }
-
-
-
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
