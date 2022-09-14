@@ -65,3 +65,38 @@ plot_species_distribution <- function(data_gbif, file.in){
   return(file.in)
   
 }
+
+
+
+#' Plot the native distribution blocks
+#' @param file.in name (including path) of the file to save
+plot_native_distribution_blocks <- function(file.in){
+  
+  # Create directory if needed
+  create_dir_if_needed(file.in)
+  
+  # Make the final plot
+  plot.out <- ne_countries(scale = "medium", returnclass = "sf") %>%
+    ggplot(aes(geometry = geometry)) +
+    geom_sf(show.legend = F, color = "#6C757D", fill = "#CED4DA", size = 0.01) +
+    geom_rect(aes(xmin = -10, xmax = 160, ymin = 25, ymax = 75), color = "#22577A", fill = "NA") +
+    geom_text(aes(x = 75, y =  80, label = "Eurasian native block"), color = "#22577A") +
+    geom_rect(aes(xmin = -160, xmax = -30, ymin = 0, ymax = 80), color = "#386641", fill = "NA") +
+    geom_text(aes(x = -95, y =  -5, label = "American native block"), color = "#386641") +
+    geom_rect(aes(xmin = 110, xmax = 154, ymin = -45, ymax = -8), color = "#540B0E", fill = "NA") +
+    geom_text(aes(x = 131, y =  -3, label = "Australian native block"), color = "#540B0E")  + 
+    coord_sf(ylim = c(-56, 80), expand = TRUE) + 
+    xlab("") + ylab("") +
+    theme(panel.background = element_rect(color = 'black', fill = 'white'), 
+          panel.grid = element_blank(), 
+          axis.text = element_blank(), 
+          axis.ticks = element_blank(), 
+          plot.title = element_text(hjust = 0.5))
+  
+  # Save the plot
+  ggsave(file.in, plot.out, width = 20, height = 8, units = "cm", dpi = 600)
+  
+  # Return the name of the file saved
+  return(file.in)
+  
+}

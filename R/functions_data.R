@@ -178,6 +178,35 @@ get_data_gbif <- function(gbif_taxon_keys, user, pwd, email){
 
 
 
+#' Function to filter gbif observations outside of the species native continent
+#' @param data_gbif presence data of gbif with coordinates
+filter_data_gbif <- function(data_gbif){
+  
+  # Create a table with coordinates limits for each species
+  coord_lim <- data.frame(species = unique(data_gbif$species)) %>%
+    mutate(
+      block = case_when(species %in% c("Pseudotsuga menziesii", "Robinia pseudoacacia") ~ "American native block", 
+                        species == "Eucalyptus camaldulensis" ~ "Australian native block", 
+                        TRUE ~ "Eurasian native block"), 
+      coord = case_when(block == "American native block" ~ "0_80_-160_-30", 
+                        block == "Australian native block" ~ "-45_-8_110_154", 
+                        block == "Eurasian native block" ~ "25_75_-10_160")
+    ) %>%
+    separate(col = "coord", into = c("lat.min", "lat.max", "long.min", "long.max"), sep = "_") %>%
+    mutate(long.min = as.numeric(long.min), long.max = as.numeric(long.max), 
+           lat.min = as.numeric(lat.min), lat.max = as.numeric(lat.max))
+  
+  
+  # Filter data gbif
+  out <- data_gbif %>%
+    left_join(coord_lim, by = "species") %>%
+    filter(decimallongitude >= long.min & decimallongitude <= long.max &
+             decimallatitude >= lat.min & decimallatitude <= lat.max)
+  
+  
+  # Return the output
+  return(out)
+}
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -353,6 +382,8 @@ extract_disturbance_index_for_gbif <- function(
   for(i in 2:length(fireweatherindex_files)) raster_fire <- c(raster_fire, terra::rast(fireweatherindex_files[i]))
   # --- Average the fire weather index over all layers
   raster_fire <- app(raster_fire, mean)
+  # --- Convert longitude from 0-360 to -180-180 scale
+  raster_fire <- rotate(raster_fire)
   # --- Extract data from raster for each gbif point
   out$fwi <- as.numeric(
     terra::extract(raster_fire, cbind(out$decimallongitude, out$decimallatitude))[, 1])
