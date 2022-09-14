@@ -3,9 +3,10 @@ library(targets)
 lapply(grep("R$", list.files("R"), value = TRUE), function(x) source(file.path("R", x)))
 packages.in <- c("dplyr", "ggplot2", "readxl", "purrr", "readr", "magrittr", "rgbif", "taxize",
                  "CoordinateCleaner", "RCurl", "httr", "archive", "terra", "cowplot", "R.utils", 
-                 "sf", "ggspatial", "rnaturalearth", "rnaturalearthdata", "tidyr")
+                 "sf", "ggspatial", "rnaturalearth", "rnaturalearthdata", "tidyr", "scales")
 for(i in 1:length(packages.in)) if(!(packages.in[i] %in% rownames(installed.packages()))) install.packages(packages.in[i])
 options(tidyverse.quiet = TRUE)
+sf::sf_use_s2(FALSE)
 tar_option_set(packages = packages.in)
 
 
@@ -75,8 +76,10 @@ list(
   # - PLOTS ---- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-  tar_target(fig_sp_distribution, plot_species_distribution(data_gbif_filtered, "fig/species_distribution.jpg"), 
-             format = "file"), 
+  # tar_target(fig_sp_distribution, plot_species_distribution(data_gbif_filtered, "fig/species_distribution.jpg"), 
+  #            format = "file"), 
+  tar_target(fig_sp_distribution_density, plot_species_distribution_density(
+    data_gbif_filtered, "fig/species_distribution_density.jpg"), format = "file"), 
   tar_target(fig_native_blocks, plot_native_distribution_blocks("fig/native_distribution_blocks.jpg"), 
               format = "file")
 )
