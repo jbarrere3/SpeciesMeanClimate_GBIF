@@ -376,14 +376,26 @@ extract_disturbance_index_for_gbif <- function(
   
   # - Compute mean fire weather index
   
-  # --- Initialize with the raster of the first day
-  raster_fire <- terra::rast(fireweatherindex_files[1])
-  # --- Assemble all raster files into one multi-layer raster
-  for(i in 2:length(fireweatherindex_files)) raster_fire <- c(raster_fire, terra::rast(fireweatherindex_files[i]))
-  # --- Average the fire weather index over all layers
+  # --- Identify the years for which we have FWI data
+  years <- unique(substr(gsub(".+FWI\\_", "", fireweatherindex_files), 1, 4))
+  # --- Loop to calculate the mean FWI for each year
+  for(i in 1:length(years)){
+    # -- List of files for year i
+    files.i <- fireweatherindex_files[grep(paste0("FWI_", years[i]), fireweatherindex_files)]
+    # Initialize the raster for year i with the first day
+    raster_year.i <- terra::rast(files.i[1])
+    # Loop on all other days
+    for(j in 2:length(files.i)) raster_year.i <- c(raster_year.i, terra::rast(files.i[j]))
+    # Average the fire weather index over all days
+    raster_year.i <- app(raster_year.i, mean)
+    # Convert longitude from 0-360 to -180-180 scale
+    raster_year.i <- rotate(raster_year.i)
+    # If i == 1, initialize the final raster, otherwise add it to final raster
+    if(i == 1) raster_fire <- raster_year.i
+    else raster_fire <- c(raster_fire, raster_year.i)
+  }
+  # --- Combine raster of all years into one raster
   raster_fire <- app(raster_fire, mean)
-  # --- Convert longitude from 0-360 to -180-180 scale
-  raster_fire <- rotate(raster_fire)
   # --- Extract data from raster for each gbif point
   out$fwi <- as.numeric(
     terra::extract(raster_fire, cbind(out$decimallongitude, out$decimallatitude))[, 1])
