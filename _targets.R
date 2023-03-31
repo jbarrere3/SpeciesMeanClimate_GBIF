@@ -17,8 +17,8 @@ list(
   #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   # Give user and password to access gbif data
-  tar_target(user, "jbarrere"), 
-  tar_target(pwd, "upekVowjass3;"), 
+  tar_target(user, "USERNAME"), 
+  tar_target(pwd, "PASSWORD"), 
   tar_target(email, "julien.barrere@inrae.fr"), 
   
   # Make and send request to download data from GBIF
